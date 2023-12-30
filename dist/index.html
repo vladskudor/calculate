@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Welcome to Firebase Hosting</title>
+
+    <!-- update the version number as needed -->
+    <script defer src="/__/firebase/10.6.0/firebase-app-compat.js"></script>
+    <!-- include only the Firebase features as you need -->
+    <script defer src="/__/firebase/10.6.0/firebase-auth-compat.js"></script>
+    <script defer src="/__/firebase/10.6.0/firebase-database-compat.js"></script>
+    <script defer src="/__/firebase/10.6.0/firebase-firestore-compat.js"></script>
+    <script defer src="/__/firebase/10.6.0/firebase-functions-compat.js"></script>
+    <script defer src="/__/firebase/10.6.0/firebase-messaging-compat.js"></script>
+    <script defer src="/__/firebase/10.6.0/firebase-storage-compat.js"></script>
+    <script defer src="/__/firebase/10.6.0/firebase-analytics-compat.js"></script>
+    <script defer src="/__/firebase/10.6.0/firebase-remote-config-compat.js"></script>
+    <script defer src="/__/firebase/10.6.0/firebase-performance-compat.js"></script>
+    <!-- 
+      initialize the SDK after all desired features are loaded, set useEmulator to false
+      to avoid connecting the SDK to running emulators.
+    -->
+    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+    <style>
+      *{
+        font-family: "Segoe UI", Tahoma , Geneva, Verdana, sans-serif;
+
+      }
+
+      body{
+        background-color: #23283b;
+        min-height: 90vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      button{
+        color: black;
+      }
+
+      .container{
+        background-color: #131313;
+        max-width: 300px;
+        height: auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 25px 35px;
+        border-radius: 10px;
+        -webkit-user-select: none;
+      }
+
+      #Display-area{
+        width: 100%;
+        margin: 3vh 0;
+        display: grid;
+        grid-template-columns: 100%;
+        grid-template-rows: repeat(2, minmax(40px, auto));
+        word-wrap: break-word;
+        padding-bottom: 20px;
+        border-bottom: 1px rgba(128, 128, 128, 0.116) solid;
+      }
+
+      #Display-area .currentInput{
+        text-align: right;
+        height: 8vh;
+        color: white;
+        font-size: xx-large;
+        line-height: 2;
+        word-wrap: break-word;
+      }
+
+      #Display-area .answerScreen{
+        text-align: right;
+        color: rgb(150, 150, 150 , 0, 0.87);
+        height: 7px;
+        line-height: 3;
+        font-size: larger;
+      }
+
+      .keypad-btns{
+        display: grid;
+        grid: repeat(7, 70px) / repeat(4, 70px);
+        grid-column-gap: 20px; 
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <section id="Display-area">
+          <div class="currentInput"></div>
+          <div class="answerScreen">0</div>
+      </section>
+      <section class="keypad-btns">
+          <button type="button" class="fun_btn" id="clear" value="">C</button>
+          <button type="button" class="fun_btn" id="erase" value="">&#11012;</button>
+          <button type="button" class="fun_btn" value="/">/</button>
+          <button type="button" class="fun_btn" value="%">%</button>
+          <button type="button" class="num_btn" value="7">7</button>
+          <button type="button" class="num_btn" value="8">8</button>
+          <button type="button" class="num_btn" value="9">9</button>
+          <button type="button" class="fun_btn" value="*">x</button>
+          <button type="button" class="num_btn" value="4">4</button>
+          <button type="button" class="num_btn" value="5">5</button>
+          <button type="button" class="num_btn" value="6">6</button>
+          <button type="button" class="fun_btn" value="-">-</button>
+          <button type="button" class="num_btn" value="1">1</button>
+          <button type="button" class="num_btn" value="2">2</button>
+          <button type="button" class="num_btn" value="3">3</button>
+          <button type="button" class="fun_btn" value="+">+</button>
+          <button type="button" class="num_btn" value="00">00</button>
+          <button type="button" class="num_btn" value="0">0</button>
+          <button type="button" class="num_btn" value=".">.</button>
+          <button type="button" class="fun_btn" id="evalute" value="">=</button>
+      </section>
+    </div>
+    <script>
+      let currentInput = document.querySelector('.currentInput');
+      let answerScreen = document.querySelector('.answerScreen');
+      let buttons = document.querySelectorAll('button');
+      let erasebtn = document.querySelector('#erasebtn');
+      let clearbtn = document.querySelector('#clear');
+      let evalute = document.querySelector('evalute');
+      let realTimeScreenValue = [];
+      clearbtn.addEventListener('click' , () => {
+        realTimeScreenValue = [''];
+        answerScreen.textContent = 0;
+        currentInput.className = 'currentInput';
+        answerScreen.className = 'answerScreen';
+        answerScreen.style.color = 'rgba(150, 150, 150, 0.87)';
+      });
+      buttons.forEach((btn) => {
+        btn.addEventListener('click' , () => {
+          if(!btn.id.match('erase')) {
+            realTimeScreenValue.push(btn.value);
+            currentInput.textContent = realTimeScreenValue.join('');
+            if(btn.classList.contains('num_btn')) {
+              answerScreen.textContent = eval(realTimeScreenValue.join(''));
+            }
+          }
+          if(btn.id.match('erase')) {
+            realTimeScreenValue.pop();
+            currentInput.textContent = realTimeScreenValue.join('');
+            answerScreen.textContent = eval(realTimeScreenValue.join(''));
+          }
+          if(btn.id.match('evalute')){
+            currentInput.className = 'answerScreen';
+            answerScreen.className = 'currentInput';
+            answerScreen.style.color = 'white';
+          }
+          if(typeof eval(realTimeScreenValue.join('')) == 'undefined'){
+            answerScreen.textContent = 0;
+          }
+        })
+      })
+    </script>
+  </body>
+</html>
